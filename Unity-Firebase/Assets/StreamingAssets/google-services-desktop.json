@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "442820726151",
+    "project_id": "unity-firebase-e669c",
+    "storage_bucket": "unity-firebase-e669c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:442820726151:android:ce168f8269db69ee9fd722",
+        "android_client_info": {
+          "package_name": "com.SombraStudios.UnityFirebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "442820726151-adlpqq59dgqvl9nmpi1vogqu9tq3tv5o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFPFasca_tr99DzGbc1pMOuXTrOOvRprI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "442820726151-adlpqq59dgqvl9nmpi1vogqu9tq3tv5o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
