@@ -11,8 +11,6 @@ public class FormNavigation : MonoBehaviour
 {
     private EventSystem system;
 
-    [SerializeField] private Button submitButton;
-
     // Start is called before the first frame update
     void Start()
     {
