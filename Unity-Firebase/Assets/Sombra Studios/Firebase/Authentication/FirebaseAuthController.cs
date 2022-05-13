@@ -3,15 +3,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+using UnityEngine.UI;
 
 public class FirebaseAuthController : MonoBehaviour
 {
+    [SerializeField] TMP_InputField _emailInput;
+    [SerializeField] TMP_InputField _passwordInput;
+    [SerializeField] TMP_InputField _verifyPassowordInput;
+    [SerializeField] Button _submitButton;
+    [SerializeField] Image _popUpMessage;
+
     private Firebase.FirebaseApp app;
     private FirebaseAuth auth;
     private FirebaseUser user;
 
-    private string _userEmail;
-    private string _userPassword;
     private string displayName;
     private string emailAddress;
     private string photoUrl;
@@ -22,12 +28,19 @@ public class FirebaseAuthController : MonoBehaviour
     void Start()
     {
         CheckDependencies();
+        AddUIListeners();
     }
 
     // Update is called once per frame
     void Update()
     {
 
+    }
+
+    void OnDestroy()
+    {
+        auth.StateChanged -= AuthStateChanged;
+        auth = null;
     }
 
     #endregion
@@ -58,6 +71,7 @@ public class FirebaseAuthController : MonoBehaviour
 
     void InitializeFirebase()
     {
+        Debug.Log("Setting up Firebase Auth");
         auth = FirebaseAuth.DefaultInstance;
         auth.StateChanged += AuthStateChanged;
         AuthStateChanged(this, null);
@@ -83,20 +97,54 @@ public class FirebaseAuthController : MonoBehaviour
         }
     }
 
+    private void AddUIListeners()
+    {
+        _emailInput.onValueChanged.AddListener(OnValueChanged);
+        _passwordInput.onValueChanged.AddListener(OnValueChanged);
+        _verifyPassowordInput.onValueChanged.AddListener(OnValueChanged);
+    }
+
+    private void OnValueChanged(string newValue)
+    {
+        if (!string.IsNullOrEmpty(_emailInput.text)
+            && !string.IsNullOrEmpty(_passwordInput.text)
+            && !string.IsNullOrEmpty(_verifyPassowordInput.text)
+            && _passwordInput.text == _verifyPassowordInput.text)
+        {
+            _submitButton.interactable = true;
+        }
+        else
+        {
+            _submitButton.interactable = false;
+        }
+    }
+
     private void CreateUser(string email, string password)
     {
+        Debug.Log("5");
+        TextMeshProUGUI infoMessage = _popUpMessage.GetComponentInChildren<TextMeshProUGUI>();
+
         auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWith(task => {
+
+
             if (task.IsCanceled)
             {
+        Debug.Log("2");
+                _popUpMessage.enabled = true;
+                infoMessage.text = "CreateUserWithEmailAndPasswordAsync was canceled.";
                 Debug.LogError("CreateUserWithEmailAndPasswordAsync was canceled.");
                 return;
             }
             if (task.IsFaulted)
             {
+        Debug.Log("3");
+                _popUpMessage.enabled = true;
+                infoMessage.text = "CreateUserWithEmailAndPasswordAsync encountered an error: " + task.Exception;
                 Debug.LogError("CreateUserWithEmailAndPasswordAsync encountered an error: " + task.Exception);
                 return;
             }
 
+        Debug.Log("4");
             // Firebase user has been created.
             Firebase.Auth.FirebaseUser newUser = task.Result;
             Debug.LogFormat("Firebase user created successfully: {0} ({1})",
@@ -132,7 +180,8 @@ public class FirebaseAuthController : MonoBehaviour
     /// </summary>
     public void Register()
     {
-        CreateUser(_userEmail, _userPassword);
+        Debug.Log("1");
+        CreateUser(_emailInput.text, _passwordInput.text);
     }
 
     /// <summary>
@@ -140,7 +189,7 @@ public class FirebaseAuthController : MonoBehaviour
     /// </summary>
     public void SignIn()
     {
-        SignIn(_userEmail, _userPassword);
+        SignIn(_emailInput.text, _passwordInput.text);
     }
 
     #endregion
