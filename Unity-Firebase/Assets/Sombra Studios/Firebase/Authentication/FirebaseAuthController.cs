@@ -2,9 +2,17 @@ using System;
 using System.Collections;
 using UnityEngine;
 using Firebase.Auth;
+using UnityEngine.Events;
+
+public class StringEvent : UnityEvent<string>
+{
+
+}
 
 public class FirebaseAuthController : MonoBehaviour
 {
+    public StringEvent OnRegister = new StringEvent();
+
     private FirebaseAuth _auth;
     private FirebaseUser _user;
 
@@ -22,12 +30,6 @@ public class FirebaseAuthController : MonoBehaviour
     {
         InitializeAuthController();
         InitializeFirebase();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     void OnDestroy()
@@ -79,23 +81,32 @@ public class FirebaseAuthController : MonoBehaviour
 
     private IEnumerator CreateUser(string email, string password)
     {
-        yield return _auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWith(task => {
-            if (task.IsCanceled)
-            {
-                Debug.LogError("CreateUserWithEmailAndPasswordAsync was canceled.");
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                Debug.LogError("CreateUserWithEmailAndPasswordAsync encountered an error: " + task.Exception);
-                return;
-            }
-            Debug.Log("4");
-            // Firebase user has been created.
-            _user = task.Result;
-            Debug.LogFormat("Firebase user created successfully: {0} ({1})",
-                _user.DisplayName, _user.UserId);
-        });
+        // Firebase Create User method
+        var task = _auth.CreateUserWithEmailAndPasswordAsync(email, password);
+        // Wait until the tas is completed
+        yield return new WaitUntil(() => task.IsCompleted);
+
+        var status = string.Empty;
+
+        if (task.IsCanceled)
+        {
+            status = "CreateUserWithEmailAndPasswordAsync was canceled.";
+            Debug.LogError(status);
+            OnRegister.Invoke(status);
+            yield break;
+        }
+        if (task.IsFaulted)
+        {
+            status = "CreateUserWithEmailAndPasswordAsync encountered an error: " + task.Exception.Message;
+            Debug.LogError(status);
+            OnRegister.Invoke(status);
+            yield break;
+        }
+        // Firebase user has been created.
+        _user = task.Result;
+        status = String.Format("Firebase user created successfully: {0} ({1})", _user.DisplayName, _user.UserId);
+        Debug.Log(status);
+        OnRegister.Invoke(status);
     }
 
     private IEnumerator SignIn(string email, string password)
@@ -112,9 +123,9 @@ public class FirebaseAuthController : MonoBehaviour
                 return;
             }
 
-            Firebase.Auth.FirebaseUser newUser = task.Result;
+            _user = task.Result;
             Debug.LogFormat("User signed in successfully: {0} ({1})",
-                newUser.DisplayName, newUser.UserId);
+                _user.DisplayName, _user.UserId);
         });
     }
     #endregion

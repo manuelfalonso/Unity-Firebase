@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,7 +9,7 @@ public class RegisterAuthController : MonoBehaviour
     [SerializeField] TMP_InputField _passwordInput;
     [SerializeField] TMP_InputField _verifyPassowordInput;
     [SerializeField] Button _submitButton;
-    //[SerializeField] GameObject _popUpMessage;
+    [SerializeField] GameObject _popUpMessage;
 
     #region Unity Events
 
@@ -16,12 +17,15 @@ public class RegisterAuthController : MonoBehaviour
     void Start()
     {
         AddUIListeners();
+
+        FirebaseAuthController.Instance.OnRegister.AddListener(UpdatePopUpMessage);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void UpdatePopUpMessage(string status)
     {
-        
+        _popUpMessage.SetActive(true);
+        var messageText = _popUpMessage.GetComponentInChildren<TextMeshProUGUI>();
+        messageText.text = status;
     }
 
     #endregion

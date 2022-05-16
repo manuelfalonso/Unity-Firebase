@@ -15,26 +15,37 @@ MonoBehaviour:
   icon: {fileID: 2800000, guid: 818402b5dfd59d649b2647961ae7293e, type: 3}
   title: Google Firebase Example
   sections:
-  - heading: Welcome to the Mobile 2D Template
-    text: This template sets up the right Project settings for developing a 2D game
-      on mobile. Also it includes some of the recommended packages for developing
-      on mobile.
+  - heading: Welcome to the Google Firebase Example
+    text: This example explores Firebase different modules and its functionalities.
+      Just Open "Start Here" Scene and test the different modules
     linkText: 
     url: 
-  - heading: Forums iOS
+  - heading: Google Firebase
     text: 
-    linkText: Get answers and support
-    url: https://forum.unity.com/forums/ios-and-tvos.27/?_ga=2.229741980.1233471755.1632783301-870874885.1598941469
-  - heading: Forums Android
+    linkText: Firebase
+    url: https://firebase.google.com/
+  - heading: Firebase Unity Setup
     text: 
-    linkText: Get answers and support
-    url: https://forum.unity.com/forums/android.30/
-  - heading: Bugs
+    linkText: Setup
+    url: https://firebase.google.com/docs/unity/setup
+  - heading: Firebase Console
     text: 
-    linkText: Report any bugs
-    url: https://unity3d.com/unity/qa/bug-reporting
-  - heading: Template feedback
+    linkText: Console
+    url: https://console.firebase.google.com/
+  - heading: 
     text: 
-    linkText: Share your feedback on this template with us
-    url: https://unitysoftware.co1.qualtrics.com/jfe/form/SV_b8GWOIYxi4l6PDE?templatename=mobile2d
+    linkText: 
+    url: 
+  - heading: Firebase Authentication
+    text: 
+    linkText: Authentication
+    url: https://firebase.google.com/docs/auth/unity/start
+  - heading: 
+    text: Email and password Sign Up
+    linkText: 
+    url: 
+  - heading: 
+    text: Sign In (In Progress)
+    linkText: 
+    url: 
   loadedLayout: 1
