@@ -41,6 +41,7 @@ public class RegisterAuthController : MonoBehaviour
 
     private void OnValueChanged(string newValue)
     {
+        // Check rules to enable the submit button
         if (!string.IsNullOrEmpty(_emailInput.text)
             && !string.IsNullOrEmpty(_passwordInput.text)
             && !string.IsNullOrEmpty(_verifyPassowordInput.text)

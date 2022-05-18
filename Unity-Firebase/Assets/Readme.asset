@@ -48,4 +48,8 @@ MonoBehaviour:
     text: Sign In (In Progress)
     linkText: 
     url: 
+  - heading: 
+    text: Sign Out
+    linkText: 
+    url: 
   loadedLayout: 1

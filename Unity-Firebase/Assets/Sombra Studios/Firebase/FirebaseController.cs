@@ -42,6 +42,7 @@ public class FirebaseController : MonoBehaviour
         }
         else
         {
+            Destroy(gameObject);
             Debug.LogError(
                 $"An intance of {nameof(FirebaseController)} already exists!");
         }

@@ -3,22 +3,41 @@ using System.Collections;
 using UnityEngine;
 using Firebase.Auth;
 using UnityEngine.Events;
+using TMPro;
+using UnityEngine.UI;
+using UnityEngine.Networking;
 
+/// <summary>
+/// Small String Event Class to pass status as string
+/// </summary>
 public class StringEvent : UnityEvent<string>
 {
 
 }
 
+/// <summary>
+/// Authentication Controller Singleton to manage the user
+/// </summary>
 public class FirebaseAuthController : MonoBehaviour
 {
+    [Tooltip("Event invoked when registering a new user." +
+        " Sends the operation status as string")]
     public StringEvent OnRegister = new StringEvent();
+    [Tooltip("Event invoked when signing in a user." +
+    " Sends the operation status as string")]
+    public StringEvent OnSignIn = new StringEvent();
 
     private FirebaseAuth _auth;
     private FirebaseUser _user;
 
-    private string displayName;
-    private string emailAddress;
-    private string photoUrl;
+    [SerializeField]
+    private TextMeshProUGUI _displayName;
+    [SerializeField]
+    private TextMeshProUGUI _emailAddress;
+    [SerializeField]
+    private Image _photo;
+    [SerializeField]
+    private Sprite _photoEmpty;
 
     private static FirebaseAuthController _instance;
     public static FirebaseAuthController Instance { get { return _instance; } }
@@ -49,11 +68,14 @@ public class FirebaseAuthController : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             _instance = this;
         }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     void InitializeFirebase()
     {
-        Debug.Log("Setting up Firebase Auth");
         _auth = FirebaseAuth.DefaultInstance;
         _auth.StateChanged += AuthStateChanged;
         AuthStateChanged(this, null);
@@ -67,16 +89,31 @@ public class FirebaseAuthController : MonoBehaviour
             if (!signedIn && _user != null)
             {
                 Debug.Log("Signed out " + _user.UserId);
+                _displayName.text = _user.DisplayName ?? "";
+                _emailAddress.text = _user.Email ?? "";
+                _photo.sprite = _photoEmpty;
             }
+
             _user = _auth.CurrentUser;
+
             if (signedIn)
             {
                 Debug.Log("Signed in " + _user.UserId);
-                displayName = _user.DisplayName ?? "";
-                emailAddress = _user.Email ?? "";
-                photoUrl = _user.PhotoUrl.ToString() ?? "";
+                _displayName.text = _user.DisplayName ?? "";
+                _emailAddress.text = _user.Email ?? "";
+                //StartCoroutine(DownloadImage(_user.PhotoUrl.ToString()));
             }
         }
+    }
+
+    private IEnumerator DownloadImage(string MediaUrl)
+    {
+        UnityWebRequest request = UnityWebRequestTexture.GetTexture(MediaUrl);
+        yield return request.SendWebRequest();
+        if (request.result == UnityWebRequest.Result.ConnectionError)
+            Debug.Log(request.error);
+        else
+            _photo.material.mainTexture = ((DownloadHandlerTexture)request.downloadHandler).texture;
     }
 
     private IEnumerator CreateUser(string email, string password)
@@ -111,23 +148,43 @@ public class FirebaseAuthController : MonoBehaviour
 
     private IEnumerator SignIn(string email, string password)
     {
-        yield return _auth.SignInWithEmailAndPasswordAsync(email, password).ContinueWith(task => {
-            if (task.IsCanceled)
-            {
-                Debug.LogError("SignInWithEmailAndPasswordAsync was canceled.");
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                Debug.LogError("SignInWithEmailAndPasswordAsync encountered an error: " + task.Exception);
-                return;
-            }
+        // Firebase Create Sign In method
+        var task = _auth.SignInWithEmailAndPasswordAsync(email, password);
+        // Wait until the tas is completed
+        yield return new WaitUntil(() => task.IsCompleted);
 
-            _user = task.Result;
-            Debug.LogFormat("User signed in successfully: {0} ({1})",
-                _user.DisplayName, _user.UserId);
-        });
+        var status = string.Empty;
+
+        if (task.IsCanceled)
+        {
+            status = "SignInWithEmailAndPasswordAsync was canceled.";
+            Debug.LogError(status);
+            OnSignIn.Invoke(status);
+            yield break;
+        }
+        if (task.IsFaulted)
+        {
+            status = "SignInWithEmailAndPasswordAsync encountered an error: " + task.Exception.Message;
+            Debug.LogError(status);
+            OnSignIn.Invoke(status);
+            yield break;
+        }
+        // Firebase user has sign in correctly
+        _user = task.Result;
+        status = string.Format("User signed in successfully: {0} ({1})",
+            _user.DisplayName, _user.UserId);
+        Debug.Log(status);
+        OnSignIn.Invoke(status);
     }
+
+    private void SignOutUser()
+    {
+        if (_auth.CurrentUser != null)
+        {
+            _auth.SignOut();
+        }
+    }
+
     #endregion
 
     #region Public Methods
@@ -146,6 +203,14 @@ public class FirebaseAuthController : MonoBehaviour
     public void LogIn(string email, string password)
     {
         StartCoroutine(SignIn(email, password));
+    }
+
+    /// <summary>
+    /// Sign Out current User
+    /// </summary>
+    public void SignOut()
+    {
+        SignOutUser();
     }
 
     #endregion
