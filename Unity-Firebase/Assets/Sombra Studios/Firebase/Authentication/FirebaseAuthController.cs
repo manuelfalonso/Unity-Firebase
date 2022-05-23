@@ -26,6 +26,7 @@ public class FirebaseAuthController : MonoBehaviour
     [Tooltip("Event invoked when signing in a user." +
     " Sends the operation status as string")]
     public StringEvent OnSignIn = new StringEvent();
+    public UnityEvent OnSignInSuccesful = new UnityEvent();
 
     private FirebaseAuth _auth;
     private FirebaseUser _user;
@@ -40,6 +41,8 @@ public class FirebaseAuthController : MonoBehaviour
     private Sprite _photoEmpty;
 
     private static FirebaseAuthController _instance;
+    private string _uid;
+
     public static FirebaseAuthController Instance { get { return _instance; } }
 
     #region Unity Events
@@ -74,13 +77,16 @@ public class FirebaseAuthController : MonoBehaviour
         }
     }
 
+    // Handle initialization of the necessary firebase modules:
     void InitializeFirebase()
     {
+        Debug.Log("Setting up Firebase Auth");
         _auth = FirebaseAuth.DefaultInstance;
         _auth.StateChanged += AuthStateChanged;
         AuthStateChanged(this, null);
     }
 
+    // Track state changes of the auth object.
     void AuthStateChanged(object sender, EventArgs eventArgs)
     {
         if (_auth.CurrentUser != _user)
@@ -92,16 +98,38 @@ public class FirebaseAuthController : MonoBehaviour
                 _displayName.text = _user.DisplayName ?? "";
                 _emailAddress.text = _user.Email ?? "";
                 _photo.sprite = _photoEmpty;
+                // The user's Id, unique to the Firebase project.
+                // Do NOT use this value to authenticate with your backend server, if you
+                // have one; use User.TokenAsync() instead.
+                _uid = _user.UserId;
             }
 
             _user = _auth.CurrentUser;
 
             if (signedIn)
             {
-                Debug.Log("Signed in " + _user.UserId);
-                _displayName.text = _user.DisplayName ?? "";
-                _emailAddress.text = _user.Email ?? "";
-                //StartCoroutine(DownloadImage(_user.PhotoUrl.ToString()));
+                if (_user != null)
+                {
+                    // Obtain information from a specific provider
+                    foreach (var profile in _user.ProviderData)
+                    {
+                        // Id of the provider (ex: google.com)
+                        string providerId = profile.ProviderId;
+
+                        // UID specific to the provider
+                        string uid = profile.UserId;
+
+                        // Name, email address, and profile photo Url
+                        string name = profile.DisplayName;
+                        string email = profile.Email;
+                        System.Uri photoUrl = profile.PhotoUrl;
+
+                        Debug.Log("ProviderId: " + providerId + ". Signed in " + profile.UserId);
+                        _displayName.text = profile.DisplayName ?? "";
+                        _emailAddress.text = profile.Email ?? "";
+                        //StartCoroutine(DownloadImage(_user.PhotoUrl.ToString()));
+                    }
+                }
             }
         }
     }
@@ -175,6 +203,7 @@ public class FirebaseAuthController : MonoBehaviour
             _user.DisplayName, _user.UserId);
         Debug.Log(status);
         OnSignIn.Invoke(status);
+        OnSignInSuccesful.Invoke();
     }
 
     private void SignOutUser()

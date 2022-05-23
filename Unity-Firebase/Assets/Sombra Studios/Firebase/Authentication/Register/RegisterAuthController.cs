@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,13 +18,6 @@ public class RegisterAuthController : MonoBehaviour
         AddUIListeners();
 
         FirebaseAuthController.Instance.OnRegister.AddListener(UpdatePopUpMessage);
-    }
-
-    private void UpdatePopUpMessage(string status)
-    {
-        _popUpMessage.SetActive(true);
-        var messageText = _popUpMessage.GetComponentInChildren<TextMeshProUGUI>();
-        messageText.text = status;
     }
 
     #endregion
@@ -53,6 +45,14 @@ public class RegisterAuthController : MonoBehaviour
         {
             _submitButton.interactable = false;
         }
+    }
+
+    // OnRegister listener event method
+    private void UpdatePopUpMessage(string status)
+    {
+        _popUpMessage.SetActive(true);
+        var messageText = _popUpMessage.GetComponentInChildren<TextMeshProUGUI>();
+        messageText.text = status;
     }
 
     #endregion
