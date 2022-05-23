@@ -20,16 +20,19 @@ public class StringEvent : UnityEvent<string>
 /// </summary>
 public class FirebaseAuthController : MonoBehaviour
 {
-    [Tooltip("Event invoked when registering a new user." +
-        " Sends the operation status as string")]
+    // Event invoked when registering a new user. 
+    // Sends the operation status as string
     public StringEvent OnRegister = new StringEvent();
-    [Tooltip("Event invoked when signing in a user." +
-    " Sends the operation status as string")]
+    // Event invoked when signing in a user
+    // Sends the operation status as string
     public StringEvent OnSignIn = new StringEvent();
     public UnityEvent OnSignInSuccesful = new UnityEvent();
+    // Event invoked when updating User profile info
+    // Sends the operation status as string
+    public StringEvent OnUpdateUser = new StringEvent();
 
     private FirebaseAuth _auth;
-    private FirebaseUser _user;
+    public FirebaseUser User { get; private set; }
 
     [SerializeField]
     private TextMeshProUGUI _displayName;
@@ -89,29 +92,29 @@ public class FirebaseAuthController : MonoBehaviour
     // Track state changes of the auth object.
     void AuthStateChanged(object sender, EventArgs eventArgs)
     {
-        if (_auth.CurrentUser != _user)
+        if (_auth.CurrentUser != User)
         {
-            bool signedIn = _user != _auth.CurrentUser && _auth.CurrentUser != null;
-            if (!signedIn && _user != null)
+            bool signedIn = User != _auth.CurrentUser && _auth.CurrentUser != null;
+            if (!signedIn && User != null)
             {
-                Debug.Log("Signed out " + _user.UserId);
-                _displayName.text = _user.DisplayName ?? "";
-                _emailAddress.text = _user.Email ?? "";
+                Debug.Log("Signed out " + User.UserId);
+                _displayName.text = User.DisplayName ?? "";
+                _emailAddress.text = User.Email ?? "";
                 _photo.sprite = _photoEmpty;
                 // The user's Id, unique to the Firebase project.
                 // Do NOT use this value to authenticate with your backend server, if you
                 // have one; use User.TokenAsync() instead.
-                _uid = _user.UserId;
+                _uid = User.UserId;
             }
 
-            _user = _auth.CurrentUser;
+            User = _auth.CurrentUser;
 
             if (signedIn)
             {
-                if (_user != null)
+                if (User != null)
                 {
                     // Obtain information from a specific provider
-                    foreach (var profile in _user.ProviderData)
+                    foreach (var profile in User.ProviderData)
                     {
                         // Id of the provider (ex: google.com)
                         string providerId = profile.ProviderId;
@@ -168,8 +171,8 @@ public class FirebaseAuthController : MonoBehaviour
             yield break;
         }
         // Firebase user has been created.
-        _user = task.Result;
-        status = String.Format("Firebase user created successfully: {0} ({1})", _user.DisplayName, _user.UserId);
+        User = task.Result;
+        status = String.Format("Firebase user created successfully: {0} ({1})", User.DisplayName, User.UserId);
         Debug.Log(status);
         OnRegister.Invoke(status);
     }
@@ -198,9 +201,9 @@ public class FirebaseAuthController : MonoBehaviour
             yield break;
         }
         // Firebase user has sign in correctly
-        _user = task.Result;
+        User = task.Result;
         status = string.Format("User signed in successfully: {0} ({1})",
-            _user.DisplayName, _user.UserId);
+            User.DisplayName, User.UserId);
         Debug.Log(status);
         OnSignIn.Invoke(status);
         OnSignInSuccesful.Invoke();
@@ -212,6 +215,37 @@ public class FirebaseAuthController : MonoBehaviour
         {
             _auth.SignOut();
         }
+    }
+
+    private IEnumerator UpdateUserProfile(string name, string email, string photoUrl)
+    {
+        if (User != null)
+        {
+            UserProfile profile = new UserProfile
+            {
+                DisplayName = name,                
+                PhotoUrl = new Uri(photoUrl),
+            };
+
+            // Firebase Create Sign In method
+            var task = User.UpdateUserProfileAsync(profile);
+            // Wait until the tas is completed
+            yield return new WaitUntil(() => task.IsCompleted);
+
+            if (task.IsCanceled)
+            {
+                Debug.LogError("UpdateUserProfileAsync was canceled.");
+                yield break;
+            }
+            if (task.IsFaulted)
+            {
+                Debug.LogError("UpdateUserProfileAsync encountered an error: " + task.Exception);
+                yield break;
+            }
+
+            Debug.Log("User profile updated successfully.");
+        }
+
     }
 
     #endregion
@@ -232,6 +266,14 @@ public class FirebaseAuthController : MonoBehaviour
     public void LogIn(string email, string password)
     {
         StartCoroutine(SignIn(email, password));
+    }
+
+    /// <summary>
+    /// Update Firebase User profile
+    /// </summary>
+    public void UpdateProfile(string name, string email, string photoUrl)
+    {
+        StartCoroutine(UpdateUserProfile(name, email, photoUrl));
     }
 
     /// <summary>
