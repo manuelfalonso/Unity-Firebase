@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Sombra Studios/Firebase/Authentication/Sign In/SignInEmailPassword.unity
     guid: 934f07ebbe99943458a4a7852759998d
+  - enabled: 1
+    path: Assets/Sombra Studios/Firebase/Authentication/Update/UpdateUserProfile.unity
+    guid: 1190b214f2813ae4f9234e35361158dd
   m_configObjects:
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: d0d2da7b0cdf7284f90aa4d6feb2b92e, type: 2}
     com.unity.adaptiveperformance.samsung.android.provider_settings: {fileID: 11400000, guid: 51f7db2af49e42e469cdd94976a0f6ba, type: 2}

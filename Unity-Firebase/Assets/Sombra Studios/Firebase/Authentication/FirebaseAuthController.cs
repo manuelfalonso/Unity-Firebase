@@ -26,10 +26,13 @@ public class FirebaseAuthController : MonoBehaviour
     // Event invoked when signing in a user
     // Sends the operation status as string
     public StringEvent OnSignIn = new StringEvent();
+    [HideInInspector]
     public UnityEvent OnSignInSuccesful = new UnityEvent();
     // Event invoked when updating User profile info
     // Sends the operation status as string
     public StringEvent OnUpdateUser = new StringEvent();
+    [HideInInspector]
+    public UnityEvent OnUpdateUserSuccesful = new UnityEvent();
 
     private FirebaseAuth _auth;
     public FirebaseUser User { get; private set; }
@@ -224,7 +227,7 @@ public class FirebaseAuthController : MonoBehaviour
             UserProfile profile = new UserProfile
             {
                 DisplayName = name,                
-                PhotoUrl = new Uri(photoUrl),
+                PhotoUrl = photoUrl.Length == 0 ? null : new Uri(photoUrl),
             };
 
             // Firebase Create Sign In method
@@ -232,18 +235,27 @@ public class FirebaseAuthController : MonoBehaviour
             // Wait until the tas is completed
             yield return new WaitUntil(() => task.IsCompleted);
 
+            var status = string.Empty;
+
             if (task.IsCanceled)
             {
-                Debug.LogError("UpdateUserProfileAsync was canceled.");
+                status = "UpdateUserProfileAsync was canceled.";
+                Debug.LogError(status);
+                OnUpdateUser.Invoke(status);
                 yield break;
             }
             if (task.IsFaulted)
             {
-                Debug.LogError("UpdateUserProfileAsync encountered an error: " + task.Exception);
+                status = "UpdateUserProfileAsync encountered an error: " + task.Exception.Message;
+                Debug.LogError(status);
+                OnUpdateUser.Invoke(status);
                 yield break;
             }
 
-            Debug.Log("User profile updated successfully.");
+            status = "User profile updated successfully.";
+            Debug.Log(status);
+            OnUpdateUser.Invoke(status);
+            OnUpdateUserSuccesful.Invoke();
         }
 
     }

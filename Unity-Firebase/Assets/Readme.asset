@@ -52,4 +52,8 @@ MonoBehaviour:
     text: Sign Out
     linkText: 
     url: 
+  - heading: ' (in progress)'
+    text: Update User Profile
+    linkText: 
+    url: 
   loadedLayout: 1

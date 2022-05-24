@@ -321,6 +321,9 @@ MonoBehaviour:
   OnSignInSuccesful:
     m_PersistentCalls:
       m_Calls: []
+  OnUpdateUserSuccesful:
+    m_PersistentCalls:
+      m_Calls: []
   _displayName: {fileID: 8731348533516294983}
   _emailAddress: {fileID: 8731348533516294982}
   _photo: {fileID: 8731348533516294984}
@@ -555,7 +558,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6190402540911819024, guid: f543b4608091b1d4e8b380dfd7a289bd, type: 3}
       propertyPath: m_text
-      value: Update Profile
+      value: User Profile
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f543b4608091b1d4e8b380dfd7a289bd, type: 3}
