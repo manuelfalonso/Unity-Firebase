@@ -161,14 +161,14 @@ public class FirebaseAuthController : MonoBehaviour
 
         if (task.IsCanceled)
         {
-            status = "CreateUserWithEmailAndPasswordAsync was canceled.";
+            status = "Register was canceled.";
             Debug.LogError(status);
             OnRegister.Invoke(status);
             yield break;
         }
         if (task.IsFaulted)
         {
-            status = "CreateUserWithEmailAndPasswordAsync encountered an error: " + task.Exception.Message;
+            status = FirebaseExceptionHelper.GetErrorFromException(task);
             Debug.LogError(status);
             OnRegister.Invoke(status);
             yield break;
@@ -198,7 +198,7 @@ public class FirebaseAuthController : MonoBehaviour
         }
         if (task.IsFaulted)
         {
-            status = "SignInWithEmailAndPasswordAsync encountered an error: " + task.Exception.Message;
+            status = FirebaseExceptionHelper.GetErrorFromException(task);
             Debug.LogError(status);
             OnSignIn.Invoke(status);
             yield break;
@@ -239,14 +239,14 @@ public class FirebaseAuthController : MonoBehaviour
 
             if (task.IsCanceled)
             {
-                status = "UpdateUserProfileAsync was canceled.";
+                status = "Update was canceled.";
                 Debug.LogError(status);
                 OnUpdateUser.Invoke(status);
                 yield break;
             }
             if (task.IsFaulted)
             {
-                status = "UpdateUserProfileAsync encountered an error: " + task.Exception.Message;
+                status = FirebaseExceptionHelper.GetErrorFromException((System.Threading.Tasks.Task<FirebaseUser>)task);
                 Debug.LogError(status);
                 OnUpdateUser.Invoke(status);
                 yield break;
