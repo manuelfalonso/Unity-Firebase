@@ -5,9 +5,6 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
   - enabled: 1
     path: Assets/Start Here.unity
     guid: 15a81a6411c0612499c7fc0d3bd61073
@@ -23,6 +20,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Sombra Studios/Firebase/Authentication/Update/UpdateUserProfile.unity
     guid: 1190b214f2813ae4f9234e35361158dd
+  - enabled: 1
+    path: Assets/Sombra Studios/Firebase/Realtime Database/Realtime Database.unity
+    guid: d97c28d3000dd024b927ab817000b850
+  - enabled: 1
+    path: Assets/Sombra Studios/Firebase/Realtime Database/Save Data/Save Data.unity
+    guid: 4570c5da67cf2d346847667bd1972d74
+  - enabled: 1
+    path: Assets/Sombra Studios/Firebase/Realtime Database/Load Data/Load Data.unity
+    guid: 044d588e154910c438b0975b158ecc8e
   m_configObjects:
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: d0d2da7b0cdf7284f90aa4d6feb2b92e, type: 2}
     com.unity.adaptiveperformance.samsung.android.provider_settings: {fileID: 11400000, guid: 51f7db2af49e42e469cdd94976a0f6ba, type: 2}

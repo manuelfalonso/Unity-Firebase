@@ -257,7 +257,6 @@ public class FirebaseAuthController : MonoBehaviour
             OnUpdateUser.Invoke(status);
             OnUpdateUserSuccesful.Invoke();
         }
-
     }
 
     #endregion
